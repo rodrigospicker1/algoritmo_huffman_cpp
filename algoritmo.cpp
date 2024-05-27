@@ -225,7 +225,6 @@ void gerar_dicionario(char **dicionario, No *raiz, char *caminho, int colunas){
     }
 }
 
-
 void imprime_dicionario(char **dicionario)
 {
     cout<<"\n\nDicionário: \n";
@@ -235,16 +234,42 @@ void imprime_dicionario(char **dicionario)
     }
 }
 
+int calcula_tamanho_string(char **dicionario, unsigned char *texto) {
+    int tam = 0, i = 0;
+    while (texto[i] != '\0') {
+        tam += strlen(dicionario[texto[i]]);
+        i++;
+    }
+    return tam + 1;
+}
+
+char* codificar(char **dicionario, unsigned char *texto) {
+    int i = 0;
+    int tam = calcula_tamanho_string(dicionario, texto);
+    char *codigo = (char*)calloc(tam, sizeof(char));
+    while (texto[i] != '\0') {
+        strcat(codigo, dicionario[texto[i]]);
+        i++;
+    }
+    return codigo;
+}
+
+
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL,"");
 
+    cout<<"BEM-VINDO AO ALGORITMO DE HUFFMAN: "<<endl;
+
     unsigned char texto[] = "Vamos aprender a programa";
+    cout<<"Palavra decodificada: "<<texto<<endl;
+    cout<<"(Mude a variável 'texto' para conseguir outro resultado)";
     unsigned int tabela_frequencia[TAM];
     Lista lista;
     No *arvore;
     int colunas;
     char **dicionario;
+    char *codificado;
 
     inicializa_tabela_com_zero(tabela_frequencia);
     preenche_tab_frequencia(texto, tabela_frequencia);
@@ -262,6 +287,9 @@ int main(int argc, char *argv[])
 	dicionario = aloca_dicionario(colunas);
 	gerar_dicionario(dicionario, arvore, "", colunas);
 	imprime_dicionario(dicionario);
+
+	codificado = codificar(dicionario, texto);
+	cout<<"\nTexto codificado: "<<codificado;
 
     return 0;
 }
