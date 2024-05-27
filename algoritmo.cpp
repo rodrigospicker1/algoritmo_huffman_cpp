@@ -13,6 +13,7 @@
 #include <ctime>
 #include <map>
 #include <locale.h>
+#include <string>
 
 using namespace std;
 
@@ -178,6 +179,62 @@ void imprimir_arvore(No *raiz, int tam)
     }
 }
 
+int altura_arvore(No *raiz){
+    int esq, dir;
+
+    if(raiz == NULL)
+        return -1;
+    else
+        esq = altura_arvore(raiz->esq) + 1;
+        dir = altura_arvore(raiz->dir) + 1;
+
+    if(esq > dir)
+        return esq;
+    else
+        return dir;
+}
+
+
+char** aloca_dicionario(int colunas){
+    char **dicionario;
+    int i;
+
+    dicionario = (char**)malloc(sizeof(char*) * TAM);
+
+    for(i = 0; i < TAM; i++){
+        dicionario[i] = (char*)calloc(colunas, sizeof(char));
+    }
+
+    return dicionario;
+}
+
+void gerar_dicionario(char **dicionario, No *raiz, char *caminho, int colunas){
+    char esquerda[colunas], direita[colunas];
+
+    if(raiz->esq == NULL && raiz->dir == NULL){
+        strcpy(dicionario[raiz->caracter], caminho);
+    }
+    else{
+        strcpy(esquerda, caminho);
+        strcat(esquerda, "0");
+        gerar_dicionario(dicionario, raiz->esq, esquerda, colunas);
+
+        strcpy(direita, caminho);
+        strcat(direita,"1");
+        gerar_dicionario(dicionario, raiz->dir,direita,colunas);
+    }
+}
+
+
+void imprime_dicionario(char **dicionario)
+{
+    cout<<"\n\nDicionário: \n";
+    for(int i = 0; i < TAM; i++){
+        if( strlen(dicionario[i]) > 0 )
+            cout<<i<<": "<<dicionario[i]<<endl;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL,"");
@@ -186,6 +243,8 @@ int main(int argc, char *argv[])
     unsigned int tabela_frequencia[TAM];
     Lista lista;
     No *arvore;
+    int colunas;
+    char **dicionario;
 
     inicializa_tabela_com_zero(tabela_frequencia);
     preenche_tab_frequencia(texto, tabela_frequencia);
@@ -196,8 +255,13 @@ int main(int argc, char *argv[])
 	imprimir_lista(&lista);
 
 	arvore = montar_arvore(&lista);
-    cout<<"\nÁrvore de Huffmanz\n";
+    cout<<"\n\nÁrvore de Huffmanz\n";
 	imprimir_arvore(arvore, 0);
+
+	colunas = altura_arvore(arvore) + 1;
+	dicionario = aloca_dicionario(colunas);
+	gerar_dicionario(dicionario, arvore, "", colunas);
+	imprime_dicionario(dicionario);
 
     return 0;
 }
