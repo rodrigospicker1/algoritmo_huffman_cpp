@@ -129,6 +129,55 @@ void imprimir_lista(Lista *lista){
     }
 }
 
+No *remove_no_inicio(Lista *lista){
+    No *aux = nullptr;
+
+    if(lista->inicio){
+        aux = lista->inicio;
+        lista->inicio = aux->proximo;
+        aux->proximo = nullptr;
+        lista->tam--;
+    }
+
+    return aux;
+}
+
+No* montar_arvore(Lista *lista)
+{
+    No *primeiro, *segundo, *novo;
+    while(lista->tam > 1)
+    {
+        primeiro = remove_no_inicio(lista);
+        segundo = remove_no_inicio(lista);
+        novo = (No*)malloc(sizeof(No));
+
+        if(novo){
+            novo->caracter = '+';
+            novo->frequencia = primeiro->frequencia + segundo->frequencia;
+            novo->esq = primeiro;
+            novo->dir = segundo;
+            novo->proximo = nullptr;
+
+            inserir_ordenado(lista, novo);
+        }
+        else{
+            cout<<"\nErro ao alocar memoria em montar arvore!\n";
+            break;
+        }
+    }
+    return lista->inicio;
+}
+
+void imprimir_arvore(No *raiz, int tam)
+{
+    if(raiz->esq == NULL && raiz->dir == NULL){
+        cout<<"Folha: "<<raiz->caracter<<"\tAltura: "<<tam<<endl;
+    }else{
+        imprimir_arvore(raiz->esq, tam + 1);
+        imprimir_arvore(raiz->dir, tam + 1);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL,"");
@@ -136,6 +185,7 @@ int main(int argc, char *argv[])
     unsigned char texto[] = "Vamos aprender a programa";
     unsigned int tabela_frequencia[TAM];
     Lista lista;
+    No *arvore;
 
     inicializa_tabela_com_zero(tabela_frequencia);
     preenche_tab_frequencia(texto, tabela_frequencia);
@@ -144,6 +194,10 @@ int main(int argc, char *argv[])
     criar_lista(&lista);
 	preencher_lista(tabela_frequencia, &lista);
 	imprimir_lista(&lista);
+
+	arvore = montar_arvore(&lista);
+    cout<<"\nÁrvore de Huffmanz\n";
+	imprimir_arvore(arvore, 0);
 
     return 0;
 }
