@@ -2,18 +2,13 @@
 /**
 * huffman.cpp
 * Um simples compressor de arquivos usando árvores de Huffman.
-* Rodrigo Spicker
+* Autor: Rodrigo Spicker
 */
 
 #include <iostream>
 #include <fstream>
-#include <queue>
-#include <bitset>
 #include <cstring>
-#include <ctime>
-#include <map>
 #include <locale.h>
-#include <string>
 
 using namespace std;
 
@@ -22,7 +17,7 @@ using namespace std;
 struct No
 {
     unsigned char caracter;
-    int frequencia;
+    int quantidade;
     No *esq;
     No *dir;
     No *proximo;
@@ -39,7 +34,7 @@ void inicializa_tabela_com_zero(unsigned int tab[])
         tab[i] = 0;
 }
 
-void preenche_tab_frequencia(unsigned char text[], unsigned int tab[])
+void preenche_tab_quantidade(unsigned char text[], unsigned int tab[])
 {
     int i = 0;
 
@@ -50,15 +45,15 @@ void preenche_tab_frequencia(unsigned char text[], unsigned int tab[])
     }
 }
 
-void imprime_tab_frequencia(unsigned int tab[])
+void imprime_tab_quantidade(unsigned int tabela[])
 {
     cout<<"\nTabela frequência\n";
     for(int i = 0; i < TAM; i++)
     {
-        if(tab[i] > 0)
+        if(tabela[i] > 0)
         {
             char letra = i;
-            cout<<i<<" = "<<tab[i]<<" = "<<letra<<endl;
+            cout<<i<<" = "<<tabela[i]<<" = "<<letra<<endl;
         }
     }
 }
@@ -77,7 +72,7 @@ void inserir_ordenado(Lista *lista, No *no){
         lista -> inicio = no;
     }
     //tem freqencia menor que o incio da lista ?
-    else if(no -> frequencia < lista -> inicio -> frequencia)
+    else if(no -> quantidade < lista -> inicio -> quantidade)
     {
         no -> proximo = lista ->inicio;
         lista->inicio = no;
@@ -85,7 +80,7 @@ void inserir_ordenado(Lista *lista, No *no){
     else
     {
         aux = lista -> inicio;
-        while(aux -> proximo && aux -> proximo -> frequencia <= no -> frequencia)
+        while(aux -> proximo && aux -> proximo -> quantidade <= no -> quantidade)
             aux = aux -> proximo;
         no -> proximo = aux -> proximo;
         aux -> proximo = no;
@@ -105,7 +100,7 @@ void preencher_lista(unsigned int tab[],Lista *lista)
             if(novo)
             {
                 novo -> caracter = i;
-                novo -> frequencia = tab[i];
+                novo -> quantidade = tab[i];
                 novo -> dir = NULL;
                 novo -> esq = NULL;
                 novo -> proximo = NULL;
@@ -114,7 +109,6 @@ void preencher_lista(unsigned int tab[],Lista *lista)
             }
             else
             {
-                cout<<"\n ERRO ao alocar memoria em preencher_lista!\n";
                 break;
             }
         }
@@ -123,9 +117,9 @@ void preencher_lista(unsigned int tab[],Lista *lista)
 void imprimir_lista(Lista *lista){
     No *aux  = lista->inicio;
 
-    cout<<"\nLista ordenada: Tamanho: "<<lista->tam;
+    cout<<"\nLista ordenada: "<<lista->tam;
     while(aux){
-        cout<<"\nCaracter: "<<aux->caracter<<" Frequência: "<<aux->frequencia;
+        cout<<"\nLetra: "<<aux->caracter<<" Quantidade: "<<aux->quantidade;
         aux = aux->proximo;
     }
 }
@@ -154,7 +148,7 @@ No* montar_arvore(Lista *lista)
 
         if(novo){
             novo->caracter = '+';
-            novo->frequencia = primeiro->frequencia + segundo->frequencia;
+            novo->quantidade = primeiro->quantidade + segundo->quantidade;
             novo->esq = primeiro;
             novo->dir = segundo;
             novo->proximo = nullptr;
@@ -229,8 +223,10 @@ void imprime_dicionario(char **dicionario)
 {
     cout<<"\n\nDicionário: \n";
     for(int i = 0; i < TAM; i++){
-        if( strlen(dicionario[i]) > 0 )
-            cout<<i<<": "<<dicionario[i]<<endl;
+        if( strlen(dicionario[i]) > 0 ){
+            char letra = i;
+            cout<<letra<<": "<<dicionario[i]<<endl;
+        }
     }
 }
 
@@ -261,22 +257,22 @@ int main(int argc, char *argv[])
 
     cout<<"BEM-VINDO AO ALGORITMO DE HUFFMAN: "<<endl;
 
-    unsigned char texto[] = "Vamos aprender a programa";
+    unsigned char texto[] = "Vamos aprender a programar";
     cout<<"Palavra decodificada: "<<texto<<endl;
-    cout<<"(Mude a variável 'texto' para conseguir outro resultado)";
-    unsigned int tabela_frequencia[TAM];
+    cout<<"(Mude a variável 'texto' para conseguir outro resultado)\n\n";
+    unsigned int tabela_quantidade[TAM];
     Lista lista;
     No *arvore;
     int colunas;
     char **dicionario;
     char *codificado;
 
-    inicializa_tabela_com_zero(tabela_frequencia);
-    preenche_tab_frequencia(texto, tabela_frequencia);
-    imprime_tab_frequencia(tabela_frequencia);
+    inicializa_tabela_com_zero(tabela_quantidade);
+    preenche_tab_quantidade(texto, tabela_quantidade);
+    imprime_tab_quantidade(tabela_quantidade);
 
     criar_lista(&lista);
-	preencher_lista(tabela_frequencia, &lista);
+	preencher_lista(tabela_quantidade, &lista);
 	imprimir_lista(&lista);
 
 	arvore = montar_arvore(&lista);
